@@ -2,7 +2,7 @@ package raytracer
 
 // Color (R, G, B)
 type Color struct {
-	R int8
-	G int8
-	B int8
+	R uint8
+	G uint8
+	B uint8
 }
