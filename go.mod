@@ -1,3 +1,3 @@
-module github.com/Sebastien/Ray-Tracer
+module github.com/SebastienDS/Ray-Tracer
 
 go 1.15
