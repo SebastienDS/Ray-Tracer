@@ -87,7 +87,7 @@ func Cross(v Vec3, v2 Vec3) Vec3 {
 		v.X*v2.Y - v.Y*v2.X}
 }
 
-// UnitVector return the unitVector
+// UnitVector return the unitVector normalized
 func (v Vec3) UnitVector() Vec3 {
 	return Div(v, v.Length())
 }
