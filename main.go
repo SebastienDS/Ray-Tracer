@@ -6,10 +6,11 @@ import (
 
 func main() {
 	// Image
-	const aspectRatio = 16.0 / 9.0
-	WIDTH := 1000
+	aspectRatio := 16.0 / 9.0
+	WIDTH := 700
 	HEIGHT := int(float64(WIDTH) / aspectRatio)
-	const samplesPerPixel = 100
+	samplesPerPixel := 100
+	maxDepth := 50
 
 	// World
 	world := raytracer.NewHittableList()
@@ -31,7 +32,7 @@ func main() {
 				v := float64(j) / float64((HEIGHT - 1))
 
 				ray := camera.GetRay(u, v)
-				pixelColor.Add(raytracer.RayColor(ray, world))
+				pixelColor.Add(raytracer.RayColor(ray, world, maxDepth))
 			}
 			raytracer.ConvertColor(&pixelColor, samplesPerPixel)
 			buffer = append(buffer, pixelColor)

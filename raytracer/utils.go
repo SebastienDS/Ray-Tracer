@@ -22,17 +22,22 @@ func DrawImage(buffer []Vec3, WIDTH int, HEIGHT int) {
 // ConvertColor _
 func ConvertColor(pixelColor *Vec3, samplesPerPixel int) {
 	scale := 1.0 / float64(samplesPerPixel)
-	pixelColor.X = Clamp(pixelColor.X*scale, 0, 1)
-	pixelColor.Y = Clamp(pixelColor.Y*scale, 0, 1)
-	pixelColor.Z = Clamp(pixelColor.Z*scale, 0, 1)
+	pixelColor.X = Clamp(math.Sqrt(pixelColor.X*scale), 0, 1)
+	pixelColor.Y = Clamp(math.Sqrt(pixelColor.Y*scale), 0, 1)
+	pixelColor.Z = Clamp(math.Sqrt(pixelColor.Z*scale), 0, 1)
 }
 
 // RayColor return the color of the background
-func RayColor(ray Ray, world Hittable) Vec3 {
+func RayColor(ray Ray, world Hittable, depth int) Vec3 {
 	rec := HitRecord{}
 
-	if world.Hit(ray, 0, math.MaxFloat64, &rec) {
-		return MulF(Add(rec.Normal, NewVec3(1, 1, 1)), 0.5)
+	if depth <= 0 {
+		return NewVec3(0, 0, 0)
+	}
+
+	if world.Hit(ray, 0.001, math.MaxFloat64, &rec) {
+		target := Add(Add(rec.P, rec.Normal), RandomUnitVector())
+		return MulF(RayColor(NewRay(rec.P, Sum(target, rec.P)), world, depth-1), 0.5)
 	}
 
 	unitDirection := ray.Direction.UnitVector()

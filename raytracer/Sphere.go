@@ -16,13 +16,13 @@ func NewSphere(center Vec3, radius float64) Sphere {
 func calculHitRecord(rec *HitRecord, s Sphere, ray Ray, temp float64) {
 	rec.T = temp
 	rec.P = ray.At(rec.T)
-	outwardNormal := Div(Neg(rec.P, s.Center), s.Radius)
+	outwardNormal := Div(Sum(rec.P, s.Center), s.Radius)
 	rec.setFaceNormal(ray, outwardNormal)
 }
 
 // Hit return if sphere is hitten
 func (s Sphere) Hit(ray Ray, tMin float64, tMax float64, rec *HitRecord) bool {
-	oc := Neg(ray.Origin, s.Center)
+	oc := Sum(ray.Origin, s.Center)
 	a := ray.Direction.LengthSquared()
 	halfB := Dot(oc, ray.Direction)
 	c := oc.LengthSquared() - s.Radius*s.Radius

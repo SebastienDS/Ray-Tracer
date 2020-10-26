@@ -1,6 +1,9 @@
 package raytracer
 
-import "math"
+import (
+	"math"
+	"math/rand"
+)
 
 // Vec3 (x, y, z)
 type Vec3 struct {
@@ -9,9 +12,37 @@ type Vec3 struct {
 	Z float64
 }
 
-//NewVec3 return a new Vec3
+// NewVec3 return a new Vec3
 func NewVec3(x, y, z float64) Vec3 {
 	return Vec3{x, y, z}
+}
+
+// NewVec3Random return a new random Vec3
+func NewVec3Random() Vec3 {
+	return Vec3{rand.Float64(), rand.Float64(), rand.Float64()}
+}
+
+// NewVec3Rand return a new random Vec3
+func NewVec3Rand(min, max float64) Vec3 {
+	return Vec3{RandomFloat(min, max), RandomFloat(min, max), RandomFloat(min, max)}
+}
+
+// RandomInUnitSphere return Vec3 with LengthSquared < 1
+func RandomInUnitSphere() Vec3 {
+	for {
+		p := NewVec3Rand(-1, 1)
+		if p.LengthSquared() < 1 {
+			return p
+		}
+	}
+}
+
+// RandomUnitVector _
+func RandomUnitVector() Vec3 {
+	a := RandomFloat(0, 2*math.Pi)
+	z := RandomFloat(-1, 1)
+	r := math.Sqrt(1 - z*z)
+	return NewVec3(r*math.Cos(a), r*math.Sin(a), z)
 }
 
 // Add v2 to v
@@ -32,8 +63,8 @@ func (v Vec3) Neg() Vec3 {
 	return Vec3{-v.X, -v.Y, -v.Z}
 }
 
-// Neg return v - v2
-func Neg(v Vec3, v2 Vec3) Vec3 {
+// Sum return v - v2
+func Sum(v Vec3, v2 Vec3) Vec3 {
 	return Vec3{v.X - v2.X, v.Y - v2.Y, v.Z - v2.Z}
 }
 
