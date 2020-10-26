@@ -63,8 +63,8 @@ func (v Vec3) Neg() Vec3 {
 	return Vec3{-v.X, -v.Y, -v.Z}
 }
 
-// Sum return v - v2
-func Sum(v Vec3, v2 Vec3) Vec3 {
+// Sub return v - v2
+func Sub(v Vec3, v2 Vec3) Vec3 {
 	return Vec3{v.X - v2.X, v.Y - v2.Y, v.Z - v2.Z}
 }
 
@@ -121,4 +121,9 @@ func Cross(v Vec3, v2 Vec3) Vec3 {
 // UnitVector return the unitVector normalized
 func (v Vec3) UnitVector() Vec3 {
 	return Div(v, v.Length())
+}
+
+// Reflect v
+func Reflect(v, n Vec3) Vec3 {
+	return Sub(v, MulF(n, 2*Dot(v, n)))
 }

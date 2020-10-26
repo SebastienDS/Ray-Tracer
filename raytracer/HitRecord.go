@@ -4,6 +4,7 @@ package raytracer
 type HitRecord struct {
 	P         Vec3
 	Normal    Vec3
+	Material  Material
 	T         float64
 	FrontFace bool
 }

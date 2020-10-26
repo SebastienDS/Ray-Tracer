@@ -36,8 +36,12 @@ func RayColor(ray Ray, world Hittable, depth int) Vec3 {
 	}
 
 	if world.Hit(ray, 0.001, math.MaxFloat64, &rec) {
-		target := Add(Add(rec.P, rec.Normal), RandomUnitVector())
-		return MulF(RayColor(NewRay(rec.P, Sum(target, rec.P)), world, depth-1), 0.5)
+		var scattered Ray
+		var attenuation Vec3
+		if rec.Material.scatter(ray, rec, &attenuation, &scattered) {
+			return Mul(attenuation, RayColor(scattered, world, depth-1))
+		}
+		return NewVec3(0, 0, 0)
 	}
 
 	unitDirection := ray.Direction.UnitVector()

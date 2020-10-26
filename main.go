@@ -14,11 +14,19 @@ func main() {
 
 	// World
 	world := raytracer.NewHittableList()
-	world.Add(raytracer.NewSphere(raytracer.NewVec3(0, 0, -1), 0.5))
-	world.Add(raytracer.NewSphere(raytracer.NewVec3(0, -100.5, -1), 100))
+
+	materialGround := raytracer.NewLambertian(raytracer.NewVec3(0.8, 0.8, 0))
+	materialCenter := raytracer.NewLambertian(raytracer.NewVec3(0.7, 0.3, 0.3))
+	materialLeft := raytracer.NewMetal(raytracer.NewVec3(0.8, 0.8, 0.8))
+	materialRight := raytracer.NewMetal(raytracer.NewVec3(0.8, 0.6, 0.2))
+
+	world.Add(raytracer.NewSphere(raytracer.NewVec3(0, -100.5, -1), 100, materialGround))
+	world.Add(raytracer.NewSphere(raytracer.NewVec3(0, 0, -1), 0.5, materialCenter))
+	world.Add(raytracer.NewSphere(raytracer.NewVec3(-1, 0, -1), 0.5, materialLeft))
+	world.Add(raytracer.NewSphere(raytracer.NewVec3(1, 0, -1), 0.5, materialRight))
 
 	// Camera
-	camera := raytracer.NewCamera()
+	camera := raytracer.NewCamera(aspectRatio)
 
 	// Render
 	var buffer []raytracer.Vec3
