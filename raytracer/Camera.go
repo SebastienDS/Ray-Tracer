@@ -1,5 +1,7 @@
 package raytracer
 
+import "math"
+
 // Camera (origin, lowerLeftCorner, Horizontal, Vertical)
 type Camera struct {
 	Origin          Vec3
@@ -9,17 +11,22 @@ type Camera struct {
 }
 
 // NewCamera return a new Camera
-func NewCamera(aspectRatio float64) Camera {
-	viewportHeight := 2.0
+func NewCamera(lookFrom Vec3, lookAt Vec3, vup Vec3, vfov float64, aspectRatio float64) Camera {
+	theta := DegreesToRadians(vfov)
+	h := math.Tan(theta / 2)
+	viewportHeight := 2 * h
 	viewportWidth := aspectRatio * viewportHeight
-	focalLength := 1.0
+
+	w := Sub(lookFrom, lookAt).UnitVector()
+	u := Cross(vup, w).UnitVector()
+	v := Cross(w, u)
 
 	camera := Camera{}
-	camera.Origin = NewVec3(0, 0, 0)
-	camera.Horizontal = NewVec3(viewportWidth, 0, 0)
-	camera.Vertical = NewVec3(0, viewportHeight, 0)
-	// lowerLeftCorner = origin - horizontal/2 - vertical/2 - vec3(0, 0, focal_length);
-	camera.LowerLeftCorner = Sub(Sub(Sub(camera.Origin, Div(camera.Horizontal, 2)), Div(camera.Vertical, 2)), NewVec3(0, 0, focalLength))
+	camera.Origin = lookFrom
+	camera.Horizontal = MulF(u, viewportWidth)
+	camera.Vertical = MulF(v, viewportHeight)
+	// lowerLeftCorner = origin - horizontal/2 - vertical/2 - w
+	camera.LowerLeftCorner = Sub(Sub(Sub(camera.Origin, Div(camera.Horizontal, 2)), Div(camera.Vertical, 2)), w)
 
 	return camera
 }

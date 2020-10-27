@@ -37,6 +37,16 @@ func RandomInUnitSphere() Vec3 {
 	}
 }
 
+// RandomInUnitDisk return Vec3 with LengthSquared < 1
+func RandomInUnitDisk() Vec3 {
+	for {
+		p := NewVec3(RandomFloat(-1, 1), RandomFloat(-1, 1), 0)
+		if p.LengthSquared() < 1 {
+			return p
+		}
+	}
+}
+
 // RandomUnitVector _
 func RandomUnitVector() Vec3 {
 	a := RandomFloat(0, 2*math.Pi)
@@ -126,4 +136,12 @@ func (v Vec3) UnitVector() Vec3 {
 // Reflect v
 func Reflect(v, n Vec3) Vec3 {
 	return Sub(v, MulF(n, 2*Dot(v, n)))
+}
+
+// Refract v
+func Refract(u Vec3, n Vec3, refractionRatio float64) Vec3 {
+	cosTheta := Dot(u.Neg(), n)
+	rOutPerp := MulF(Add(u, MulF(n, cosTheta)), refractionRatio)
+	rOutParallel := MulF(n, -math.Sqrt(math.Abs(1-rOutPerp.LengthSquared())))
+	return Add(rOutPerp, rOutParallel)
 }
