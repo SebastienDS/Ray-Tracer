@@ -45,24 +45,26 @@ func main() {
 	img := image.NewRGBA(image.Rect(0, 0, WIDTH, HEIGHT))
 	var wg sync.WaitGroup
 
-	for index := 0; index < WIDTH*HEIGHT; index++ {
+	for j := 0; j < HEIGHT; j++ {
 		wg.Add(1)
 
-		go func(i, j int) {
-			pixelColor := raytracer.NewVec3(0, 0, 0)
+		go func(j int) {
+			for i := 0; i < WIDTH; i++ {
+				pixelColor := raytracer.NewVec3(0, 0, 0)
 
-			for s := 0; s < samplesPerPixel; s++ {
-				u := float64(i) / float64(WIDTH-1)
-				v := float64(j) / float64(HEIGHT-1)
+				for s := 0; s < samplesPerPixel; s++ {
+					u := float64(i) / float64(WIDTH-1)
+					v := float64(j) / float64(HEIGHT-1)
 
-				ray := camera.GetRay(u, v)
-				pixelColor.Add(raytracer.RayColor(ray, world, maxDepth))
+					ray := camera.GetRay(u, v)
+					pixelColor.Add(raytracer.RayColor(ray, world, maxDepth))
+				}
+				raytracer.ConvertColor(&pixelColor, samplesPerPixel)
+				img.Set(i, HEIGHT-j, color.RGBA{uint8(255 * pixelColor.X), uint8(255 * pixelColor.Y), uint8(255 * pixelColor.Z), 0xff})
+
+				wg.Done()
 			}
-			raytracer.ConvertColor(&pixelColor, samplesPerPixel)
-			img.Set(i, HEIGHT-j, color.RGBA{uint8(255 * pixelColor.X), uint8(255 * pixelColor.Y), uint8(255 * pixelColor.Z), 0xff})
-
-			wg.Done()
-		}(index%WIDTH, index/WIDTH)
+		}(j)
 	}
 
 	wg.Wait()
