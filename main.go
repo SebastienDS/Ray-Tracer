@@ -1,19 +1,25 @@
 package main
 
 import (
+	"image"
+	"image/color"
+	"image/png"
+	"os"
+	"sync"
+
 	"github.com/SebastienDS/Ray-Tracer/raytracer"
 )
 
 func main() {
 	// Image
-	aspectRatio := 16.0 / 9.0
-	WIDTH := 700
+	aspectRatio := 3.0 / 2.0
+	WIDTH := 1200
 	HEIGHT := int(float64(WIDTH) / aspectRatio)
-	samplesPerPixel := 100
+	samplesPerPixel := 500
 	maxDepth := 50
 
 	// World
-	world := raytracer.NewHittableList()
+	world := raytracer.RandomScene()
 
 	materialGround := raytracer.NewLambertian(raytracer.NewVec3(0.8, 0.8, 0))
 	materialCenter := raytracer.NewLambertian(raytracer.NewVec3(0.1, 0.2, 0.5))
@@ -27,13 +33,22 @@ func main() {
 	world.Add(raytracer.NewSphere(raytracer.NewVec3(1, 0, -1), 0.5, materialRight))
 
 	// Camera
-	camera := raytracer.NewCamera(raytracer.NewVec3(-2, 2, 1), raytracer.NewVec3(0, 0, -1), raytracer.NewVec3(0, 1, 0), 20, aspectRatio)
+	lookFrom := raytracer.NewVec3(13, 2, 3)
+	lookAt := raytracer.NewVec3(0, 0, 0)
+	vup := raytracer.NewVec3(0, 1, 0)
+	distToFocus := 10.0
+	aperture := 0.1
+
+	camera := raytracer.NewCamera(lookFrom, lookAt, vup, 20, aspectRatio, aperture, distToFocus)
 
 	// Render
-	var buffer []raytracer.Vec3
+	img := image.NewRGBA(image.Rect(0, 0, WIDTH, HEIGHT))
+	var wg sync.WaitGroup
 
-	for j := HEIGHT - 1; j >= 0; j-- {
-		for i := 0; i < WIDTH; i++ {
+	for index := 0; index < WIDTH*HEIGHT; index++ {
+		wg.Add(1)
+
+		go func(i, j int) {
 			pixelColor := raytracer.NewVec3(0, 0, 0)
 
 			for s := 0; s < samplesPerPixel; s++ {
@@ -44,10 +59,15 @@ func main() {
 				pixelColor.Add(raytracer.RayColor(ray, world, maxDepth))
 			}
 			raytracer.ConvertColor(&pixelColor, samplesPerPixel)
-			buffer = append(buffer, pixelColor)
-		}
+			img.Set(i, HEIGHT-j, color.RGBA{uint8(255 * pixelColor.X), uint8(255 * pixelColor.Y), uint8(255 * pixelColor.Z), 0xff})
+
+			wg.Done()
+		}(index%WIDTH, index/WIDTH)
 	}
 
-	// raytracer.RenderPPM(buffer, WIDTH, HEIGHT)
-	raytracer.RenderPNG(buffer, WIDTH, HEIGHT)
+	wg.Wait()
+
+	f, _ := os.OpenFile("raytracer2.png", os.O_WRONLY|os.O_CREATE, 0600)
+	defer f.Close()
+	png.Encode(f, img)
 }

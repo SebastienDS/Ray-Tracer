@@ -1,42 +1,9 @@
 package raytracer
 
 import (
-	"fmt"
-	"image"
-	"image/color"
-	"image/png"
 	"math"
 	"math/rand"
-	"os"
 )
-
-// RenderPPM create a ppm file
-func RenderPPM(buffer []Vec3, WIDTH int, HEIGHT int) {
-	f, _ := os.Create("raytracer.ppm")
-	defer f.Close()
-
-	f.WriteString(fmt.Sprintf("P3\n%d %d\n255\n", WIDTH, HEIGHT))
-
-	for _, color := range buffer {
-		f.WriteString(fmt.Sprintf("%d %d %d\n", int(255*color.X), int(255*color.Y), int(255*color.Z)))
-	}
-}
-
-// RenderPNG create a ppm file
-func RenderPNG(buffer []Vec3, WIDTH int, HEIGHT int) {
-	img := image.NewRGBA(image.Rect(0, 0, WIDTH, HEIGHT))
-
-	for index, value := range buffer {
-		i := index % WIDTH
-		j := index / WIDTH
-
-		img.Set(i, j, color.RGBA{uint8(255 * value.X), uint8(255 * value.Y), uint8(255 * value.Z), 0xff})
-	}
-
-	f, _ := os.OpenFile("raytracer.png", os.O_WRONLY|os.O_CREATE, 0600)
-	defer f.Close()
-	png.Encode(f, img)
-}
 
 // ConvertColor in [0, 1]
 func ConvertColor(pixelColor *Vec3, samplesPerPixel int) {
